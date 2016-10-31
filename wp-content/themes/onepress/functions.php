@@ -156,8 +156,42 @@ function onepress_scripts() {
 	);
 	wp_localize_script( 'jquery', 'onepress_js_settings', $onepress_js_settings );
 
+	global $wp_query;
+
+	wp_localize_script('onepress-theme', 'ajaxpagination', [
+		'ajaxurl' => admin_url('admin-ajax.php'),
+		'query_vars' => json_encode($wp_query->query_vars)
+	]);
+
 }
 add_action( 'wp_enqueue_scripts', 'onepress_scripts' );
+
+add_action( 'wp_ajax_nopriv_ajax_pagination', 'onepress_ajax_pagination' );
+add_action( 'wp_ajax_ajax_pagination', 'onepress_ajax_pagination' );
+
+function onepress_ajax_pagination() {
+	$query_vars['posts_per_page'] = 5;
+	$query_vars['post_type'] = 'post';
+	$query_vars['paged'] = $_POST['page'];
+
+	$posts = new WP_Query( $query_vars );
+
+	$output = [
+		'posts' => '',
+		'hide' => 0
+	];
+
+	if ($posts->have_posts()){
+		while ( $posts->have_posts() ) {
+			$posts->the_post();
+			get_template_part( 'template-parts/content', get_post_format() );
+		}
+	} else {
+		echo 0;
+	}
+
+	die();
+}
 
 
 if ( ! function_exists( 'onepress_fonts_url' ) ) :

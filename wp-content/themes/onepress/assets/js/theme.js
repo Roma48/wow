@@ -342,3 +342,31 @@ jQuery( document ).ready( function( $ ){
     });
 
 })();
+
+
+/**
+ * Ajax load posts
+ */
+( function() {
+    var page = 2;
+    jQuery('.all-news > a.btn').click(function(e){
+        e.preventDefault();
+        jQuery.ajax({
+            url: ajaxpagination.ajaxurl,
+            type: 'post',
+            data: {
+                action: 'ajax_pagination',
+                query_vars: ajaxpagination.query_vars,
+                page: page
+            },
+            success: function(result){
+                page++;
+                if (result != 0){
+                    jQuery('.all-news').before(result);
+                } else {
+                    jQuery('.all-news > a.btn').hide();
+                }
+            }
+        });
+    });
+})();
